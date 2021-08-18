@@ -2,8 +2,8 @@ package uk.gov.nationalarchives.pdi.step.xml;
 
 public class CanonicalizationResult {
 
-    private String canonicalXml;
-    private StringBuilder errorMessageBuilder = new StringBuilder();
+    private final String canonicalXml;
+    private String errorMessage = "";
     private Boolean hasErrors = false;
     private Long errorCount = 0L;
 
@@ -15,9 +15,9 @@ public class CanonicalizationResult {
         return canonicalXml;
     }
 
-    public void setCanonicalXml(String canonicalXml) {
-        this.canonicalXml = canonicalXml;
-    }
+//    public void setCanonicalXml(String canonicalXml) {
+//        this.canonicalXml = canonicalXml;
+//    }
 
     public Boolean hasErrors() {
         return hasErrors;
@@ -35,12 +35,12 @@ public class CanonicalizationResult {
         errorCount++;
     }
 
-    public String getAllErrors() {
-        return errorMessageBuilder.toString();
+    public String getErrorMessage() {
+        return errorMessage;
     }
 
-    public void appendError(String errorMessage) {
-        errorMessageBuilder.append(errorMessage);
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
 }

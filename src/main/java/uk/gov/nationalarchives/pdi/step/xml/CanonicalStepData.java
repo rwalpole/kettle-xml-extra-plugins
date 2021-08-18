@@ -13,6 +13,7 @@ public class CanonicalStepData extends BaseStepData implements StepDataInterface
     private DocumentBuilder builder;
     private RowMetaInterface outputRowMeta;
     private int xmlFieldIdx;
+    private int outputFieldIndex = -1;
 
     public void setXmlFieldIdx(int xmlFieldIdx) {
         this.xmlFieldIdx = xmlFieldIdx;
@@ -25,8 +26,6 @@ public class CanonicalStepData extends BaseStepData implements StepDataInterface
     public void setOutputFieldIndex(int outputFieldIndex) {
         this.outputFieldIndex = outputFieldIndex;
     }
-
-    private int outputFieldIndex;
 
     public void setCanonicalizer(Canonicalizer canon) {
         this.canon = canon;

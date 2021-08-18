@@ -27,7 +27,7 @@ public class CanonicalStepDialog extends BaseStepDialog implements StepDialogInt
      *  The properties file with localized keys is expected to reside in
      *  {the package of the class specified}/messages/messages_{locale}.properties
      */
-    private static Class<?> PKG = CanonicalStepMeta.class; // for i18n purposes
+    private static final Class<?> PKG = CanonicalStepMeta.class; // for i18n purposes
 
     // this is the object the stores the step's settings
     // the dialog reads the settings from it when opening
@@ -37,7 +37,7 @@ public class CanonicalStepDialog extends BaseStepDialog implements StepDialogInt
     // text field holding the name of the field to add to the row stream
     private LabelText xmlOutputFieldName;
     private Label wlField;
-    private CCombo wField;
+    private CCombo xmlInputField;
 
     /**
      * The constructor should simply invoke super() and save the incoming meta
@@ -131,24 +131,24 @@ public class CanonicalStepDialog extends BaseStepDialog implements StepDialogInt
         fdlField.top = new FormAttachment( wStepname, 2 * margin );
         fdlField.right = new FormAttachment( middle, -margin );
         wlField.setLayoutData( fdlField );
-        wField = new CCombo( shell, SWT.BORDER | SWT.READ_ONLY );
-        wField.setEditable( true );
-        props.setLook( wField );
-        wField.addModifyListener( lsMod );
+        xmlInputField = new CCombo( shell, SWT.BORDER | SWT.READ_ONLY );
+        xmlInputField.setEditable( true );
+        props.setLook(xmlInputField);
+        xmlInputField.addModifyListener( lsMod );
 
         FormData fdField = new FormData();
         fdField.left = new FormAttachment( middle, margin );
         fdField.top = new FormAttachment( wStepname, 2 * margin );
         fdField.right = new FormAttachment( 100, -margin );
-        wField.setLayoutData( fdField );
-        wField.addFocusListener( new FocusListener() {
+        xmlInputField.setLayoutData( fdField );
+        xmlInputField.addFocusListener(new FocusListener() {
             public void focusLost( org.eclipse.swt.events.FocusEvent e ) {
             }
 
             public void focusGained( org.eclipse.swt.events.FocusEvent e ) {
                 Cursor busy = new Cursor( shell.getDisplay(), SWT.CURSOR_WAIT );
                 shell.setCursor( busy );
-                PopulateFields( wField );
+                PopulateFields(xmlInputField);
                 shell.setCursor( null );
                 busy.dispose();
             }
@@ -160,7 +160,7 @@ public class CanonicalStepDialog extends BaseStepDialog implements StepDialogInt
         FormData fdValName = new FormData();
         fdValName.left = new FormAttachment( middle, 0 );
         fdValName.right = new FormAttachment( 100, 0 );
-        fdValName.top = new FormAttachment( wField, margin );
+        fdValName.top = new FormAttachment(xmlInputField, margin );
         xmlOutputFieldName.setLayoutData( fdValName );
 
 
@@ -232,6 +232,7 @@ public class CanonicalStepDialog extends BaseStepDialog implements StepDialogInt
      */
     private void populateDialog() {
         wStepname.selectAll();
+        //xmlInputField.setText(meta.getInputField());
         xmlOutputFieldName.setText( meta.getOutputField() );
     }
 
@@ -256,6 +257,7 @@ public class CanonicalStepDialog extends BaseStepDialog implements StepDialogInt
         // Setting to step name from the dialog control
         stepname = wStepname.getText();
         // Setting the  settings to the meta object
+        meta.setInputField(xmlInputField.getText());
         meta.setOutputField( xmlOutputFieldName.getText() );
         // close the SWT dialog window
         dispose();
@@ -276,10 +278,9 @@ public class CanonicalStepDialog extends BaseStepDialog implements StepDialogInt
                 cc.setText( initValue );
             }
         } catch ( KettleException ke ) {
-            new ErrorDialog( shell, BaseMessages.getString( PKG, "XsltDialog.FailedToGetFields.DialogTitle" ), BaseMessages
-                    .getString( PKG, "XsltDialog.FailedToGetFields.DialogMessage" ), ke );
+            new ErrorDialog( shell, BaseMessages.getString( PKG, "CanonicalStepDialog.FailedToGetFields.DialogTitle" ), BaseMessages
+                    .getString( PKG, "CanonicalStepDialog.FailedToGetFields.DialogMessage" ), ke );
         }
-
     }
 
 }

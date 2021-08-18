@@ -3,6 +3,7 @@ package uk.gov.nationalarchives.pdi.step.xml;
 import org.apache.commons.io.IOUtils;
 import org.apache.xml.security.c14n.Canonicalizer;
 import org.pentaho.di.core.exception.KettleException;
+import org.pentaho.di.core.row.RowDataUtil;
 import org.pentaho.di.trans.Trans;
 import org.pentaho.di.trans.TransMeta;
 import org.pentaho.di.trans.step.*;
@@ -44,6 +45,8 @@ public class CanonicalStep extends BaseStep implements StepInterface {
         if(first) {
             first = false;
             data.setOutputRowMeta(getInputRowMeta().clone());
+            meta.getFields( data.getOutputRowMeta(), getStepname(), null, null, this, null, null );
+            data.setXmlFieldIdx(getInputRowMeta().indexOfValue(meta.getInputField()));
             data.setOutputFieldIndex(data.getOutputRowMeta().indexOfValue(meta.getOutputField()));
             org.apache.xml.security.Init.init();
             data.setCanonicalizer(getCanonicalizer());
@@ -53,16 +56,17 @@ public class CanonicalStep extends BaseStep implements StepInterface {
         if(xmlFieldValue instanceof String) {
             final CanonicalizationResult result = process((String)xmlFieldValue,data);
             if(result.hasErrors()) {
-
+                putError(data.getOutputRowMeta(), row, result.getErrorCount(), result.getErrorMessage(), meta.getInputField(), "CanonicalStep001");
             } else {
-                result.getCanonicalXml();
+                Object[] outputRow = RowDataUtil.resizeArray(row,data.getOutputRowMeta().size());
+                outputRow[data.getOutputFieldIndex()] = result.getCanonicalXml();
+                putRow(data.getOutputRowMeta(),outputRow);
             }
+            return true;
         } else {
-
+            throw new KettleException("Expected field " + meta.getInputField() + " to contain XML as type java.lang.String, but found "
+                    + xmlFieldValue.getClass());
         }
-
-        return true;
-
     }
 
     private CanonicalizationResult process(String xmlString, CanonicalStepData data) {
@@ -71,7 +75,9 @@ public class CanonicalStep extends BaseStep implements StepInterface {
             return new CanonicalizationResult(canonicalize(xmlDoc,data));
         } catch (KettleException kex) {
             CanonicalizationResult result = new CanonicalizationResult("");
-            // TODO set error details
+            result.setErrorMessage(kex.getMessage());
+            result.setHasErrors(true);
+            result.incrementErrorCount();
             return result;
         }
     }
